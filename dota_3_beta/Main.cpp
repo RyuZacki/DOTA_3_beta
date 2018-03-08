@@ -22,11 +22,45 @@ const int W = 16;
 
 bool isStart = true;
 
-string name = "pudge";
-double health = 100;
-double mana = 0;
-int x = 1;
-int y = 1;
+struct point
+{
+	int x;
+	int y;
+};
+
+class player
+{
+public:
+	string name;
+	double health;
+	double mana;
+	point cord;
+	
+	void movePlayer(int dx, int dy)
+	{
+		int newX = this->cord.x + dx;
+		int newY = this->cord.y + dy;
+
+		map[this->cord.y][this->cord.x] = SPACE;
+
+		this->checkCollision(newX, newY);
+	}
+
+	void checkCollision(int newX, int newY)
+	{
+		switch (map[newY][newX])
+		{
+		case WALL: newX = this->cord.x; newY = this->cord.y; break;
+		case RUNE: this->mana += 100; createObject(RUNE); break;
+		case MINE: this->health -= 10; createObject(MINE); break;
+		}
+
+		this->cord.x = newX;
+		this->cord.y = newY;
+	}
+};
+
+player p;
 
 int map[H][W] = 
 { 
@@ -74,8 +108,8 @@ void renderMap()
 	SetConsoleCursorPosition(ñonsole, position);
 
 	cout << "Hello Dota 3 beta" << endl;
-	cout << "Health: " << health << "=====" << endl;
-	cout << "score: " << mana << endl;
+	cout << "Health: " << p.health << "=====" << endl;
+	cout << "score: " << p.mana << endl;
 
 	for (int i = 0; i < H; i++)
 	{
@@ -101,29 +135,6 @@ void createObject(int object)
 	map[yR][xR] = object;
 }
 
-void checkCollision(int newX, int newY)
-{
-	switch (map[newY][newX])
-	{
-	case WALL: newX = x; newY = y; break;
-	case RUNE: mana += 100; createObject(RUNE); break;
-	case MINE: health -= 10; createObject(MINE); break;
-	}
-
-	x = newX;
-	y = newY;
-}
-
-void movePlayer(int dx, int dy)
-{
-	int newX = x + dx;
-	int newY = y + dy;
-
-	map[y][x] = SPACE;
-
-	checkCollision(newX, newY);
-}
-
 void checkKey()
 {
 	if (_kbhit())
@@ -131,30 +142,61 @@ void checkKey()
 		int key = _getch();
 		switch (key)
 		{
-		case 72: movePlayer(0, -1); break;
-		case 80: movePlayer(0, 1); break;
-		case 75: movePlayer(-1, 0); break;
-		case 77: movePlayer(1, 0); break;
+		case 72: p.movePlayer(0, -1); break;
+		case 80: p.movePlayer(0, 1); break;
+		case 75: p.movePlayer(-1, 0); break;
+		case 77: p.movePlayer(1, 0); break;
 		case 27: isStart = false; break;
 		}
 	}
 }
 
-void renderPlayer()
+void renderPlayer(player pr)
 {
-	map[y][x] = PLAYER;
+	map[pr.cord.y][pr.cord.x] = PLAYER;
+}
+
+void checkGameWin()
+{
+	if (p.mana >= 1500)
+	{
+		system("cls");
+		cout << "You WIN!!" << endl;
+		isStart = false;
+	}
+}
+
+void checkGameOver()
+{
+	if (p.health <= 0)
+	{
+		system("cls");
+		cout << "Game Over!" << endl;
+		isStart = false;
+	}
 }
 
 int main()
 {
+	p.name = "pudge";
+	p.health = 100;
+	p.mana = 0;
+	p.cord.x = 1;
+	p.cord.y = 1;
+
 	while (isStart)       
 	{
 		renderMap(); 
-		renderPlayer();
+		renderPlayer(p);
 		checkKey();
+
+		checkGameWin();
+		checkGameOver();
 
 		Sleep(FPS);
 	}
+
+	system("pause");
 
 	return 1;
 }
