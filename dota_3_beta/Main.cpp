@@ -23,7 +23,7 @@ const int W = 16;
 bool isStart = true;
 
 string name = "pudge";
-double Health = 100;
+double health = 100;
 double mana = 0;
 int x = 1;
 int y = 1;
@@ -74,7 +74,7 @@ void renderMap()
 	SetConsoleCursorPosition(ñonsole, position);
 
 	cout << "Hello Dota 3 beta" << endl;
-	cout << "Health: " << Health << "=====" << endl;
+	cout << "Health: " << health << "=====" << endl;
 	cout << "score: " << mana << endl;
 
 	for (int i = 0; i < H; i++)
@@ -87,7 +87,7 @@ void renderMap()
 	}
 }
 
-void createRune()
+void createObject(int object)
 {
 	int xR;
 	int yR;
@@ -98,21 +98,7 @@ void createRune()
 		yR = rand() % H;
 	} while (map[yR][xR] != SPACE);
 
-	map[yR][xR] = RUNE;
-}
-
-void createMine()
-{
-	int xR;
-	int yR;
-
-	do
-	{
-		xR = rand() % W;
-		yR = rand() % H;
-	} while (map[yR][xR] != SPACE);
-
-	map[yR][xR] = MINE;
+	map[yR][xR] = object;
 }
 
 void checkCollision(int newX, int newY)
@@ -120,8 +106,8 @@ void checkCollision(int newX, int newY)
 	switch (map[newY][newX])
 	{
 	case WALL: newX = x; newY = y; break;
-	case RUNE: mana += 100; createRune(); break;
-	case MINE: Health = Health - 10; createMine(); break;
+	case RUNE: mana += 100; createObject(RUNE); break;
+	case MINE: health -= 10; createObject(MINE); break;
 	}
 
 	x = newX;
