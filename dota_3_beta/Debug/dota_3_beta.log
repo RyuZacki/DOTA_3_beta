@@ -1,3 +1,5 @@
 ﻿  Main.cpp
-  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\DOTA_3_beta\Debug\dota_3_beta.exe
-  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\DOTA_3_beta\Debug\dota_3_beta.pdb (Full PDB)
+c:\users\windows\desktop\projects\dota_3_beta\dota_3_beta\main.cpp(44): error C2065: map: необъявленный идентификатор
+c:\users\windows\desktop\projects\dota_3_beta\dota_3_beta\main.cpp(51): error C2065: map: необъявленный идентификатор
+c:\users\windows\desktop\projects\dota_3_beta\dota_3_beta\main.cpp(54): error C3861: createObject: идентификатор не найден
+c:\users\windows\desktop\projects\dota_3_beta\dota_3_beta\main.cpp(55): error C3861: createObject: идентификатор не найден
