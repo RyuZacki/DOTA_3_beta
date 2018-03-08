@@ -15,6 +15,7 @@ const int SPACE = 0;
 const int WALL = 1;
 const int PLAYER = 2;
 const int RUNE = 3;
+const int MINE = 4;
 
 const int H = 16;
 const int W = 16;
@@ -22,6 +23,7 @@ const int W = 16;
 bool isStart = true;
 
 string name = "pudge";
+double Health = 100;
 double mana = 0;
 int x = 1;
 int y = 1;
@@ -36,13 +38,13 @@ int map[H][W] =
 	{ 1,0,0,0,0,1,0,0,0,0,1,0,1,1,0,1 },
 	{ 1,0,1,0,0,1,0,1,0,3,1,0,0,0,0,1 },
 	{ 1,0,1,0,1,1,1,1,0,1,1,0,1,1,1,1 },
-	{ 1,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1 },
+	{ 1,0,1,0,0,0,0,1,4,1,0,0,0,0,0,1 },
 	{ 1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1 },
-	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
-	{ 1,3,1,1,1,3,0,0,0,0,0,0,0,0,0,1 },
-	{ 1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1 },
-	{ 1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1 },
-	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,1 },
+	{ 1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1 },
+	{ 1,3,1,1,1,3,0,0,0,0,1,0,0,1,0,1 },
+	{ 1,0,1,0,0,1,1,1,1,0,1,1,0,1,1,1 },
+	{ 1,0,1,0,1,0,0,0,0,1,0,0,0,0,0,1 },
+	{ 1,0,0,0,1,0,0,1,0,0,0,0,0,3,0,1 },
 	{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
 };
 
@@ -60,6 +62,9 @@ string getObject(int x, int y)
 		render = " X ";
 	else if (cell == RUNE)
 		render = " $ ";
+	else if (cell == MINE)
+		render = " * ";	
+		
 
 	return render;
 }
@@ -69,6 +74,7 @@ void renderMap()
 	SetConsoleCursorPosition(ñonsole, position);
 
 	cout << "Hello Dota 3 beta" << endl;
+	cout << "Health: " << Health << endl;
 	cout << "score: " << mana << endl;
 
 	for (int i = 0; i < H; i++)
@@ -95,12 +101,27 @@ void createRune()
 	map[yR][xR] = RUNE;
 }
 
+void createMine()
+{
+	int xR;
+	int yR;
+
+	do
+	{
+		xR = rand() % W;
+		yR = rand() % H;
+	} while (map[yR][xR] != SPACE);
+
+	map[yR][xR] = MINE;
+}
+
 void checkCollision(int newX, int newY)
 {
 	switch (map[newY][newX])
 	{
 	case WALL: newX = x; newY = y; break;
-	case RUNE: mana += 10; createRune(); break;
+	case RUNE: mana += 100; createRune(); break;
+	case MINE: Health = Health - 10; createMine(); break;
 	}
 
 	x = newX;

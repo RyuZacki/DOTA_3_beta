@@ -1,3 +1,3 @@
 ﻿  Main.cpp
-  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\dota_3_beta\Debug\dota_3_beta.exe
-  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\dota_3_beta\Debug\dota_3_beta.pdb (Full PDB)
+c:\users\windows\desktop\projects\dota_3_beta\dota_3_beta\main.cpp(21): error C2143: синтаксическая ошибка: отсутствие ";" перед "const"
+c:\users\windows\desktop\projects\dota_3_beta\dota_3_beta\main.cpp(71): error C2143: синтаксическая ошибка: отсутствие ";" перед "return"
