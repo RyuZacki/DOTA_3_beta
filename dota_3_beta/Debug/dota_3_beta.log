@@ -1,3 +1,4 @@
 ﻿  Main.cpp
-  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\dota_3_beta\Debug\dota_3_beta.exe
-  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\dota_3_beta\Debug\dota_3_beta.pdb (Full PDB)
+c:\users\windows\desktop\projects\dota_3_beta\dota_3_beta\main.cpp(218): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\DOTA_3_beta\Debug\dota_3_beta.exe
+  dota_3_beta.vcxproj -> C:\Users\Windows\Desktop\Projects\DOTA_3_beta\Debug\dota_3_beta.pdb (Full PDB)
