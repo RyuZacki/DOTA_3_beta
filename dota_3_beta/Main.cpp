@@ -3,6 +3,8 @@
 #include "conio.h"
 #include "time.h"
 #include "windows.h"
+#include "locale.h"
+#include "fstream"
 
 using namespace std;
 
@@ -10,6 +12,12 @@ COORD position = { 0, 0 }; //ïîçèöèÿ x è y
 HANDLE ñonsole = GetStdHandle(STD_OUTPUT_HANDLE);//êîíñîëü
 
 const int FPS = 1000 / 60;
+
+const int KEY_UP = 72;
+const int KEY_DOWN = 80;
+const int KEY_LEFT = 75;
+const int KEY_RIGHT = 77;
+const int KEY_ENTER = 13;
 
 const int SPACE = 0;
 const int WALL = 1;
@@ -20,7 +28,22 @@ const int MINE = 4;
 const int H = 16;
 const int W = 16;
 
+const int COUNT_PARAMS = 4;
+string params[COUNT_PARAMS];
+int cursor = 0;
+
+int level = 1;
+string lvlName;
+
 bool isStart = true;
+bool isMenu = true;
+
+int map[H][W];
+
+void startGame();
+void createObject(int object);
+void exitGame();
+void startGame();
 
 struct point
 {
@@ -35,7 +58,15 @@ public:
 	double health;
 	double mana;
 	point cord;
+	string body;
 	
+	player()
+	{
+		this->cord.x = 1;
+		this->cord.y = 1;
+		this->mana = 0;
+	}
+
 	void movePlayer(int dx, int dy)
 	{
 		int newX = this->cord.x + dx;
@@ -60,65 +91,43 @@ public:
 	}
 };
 
+const int COUNT_PLAYERS = 3;
+int numPlayer = 0;
+
+player players[COUNT_PLAYERS];
 player p;
 
-int map[H][W] = 
-{ 
-	{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
-    { 1,0,1,0,0,0,0,1,0,1,0,0,0,0,0,1 },
-	{ 1,0,1,1,1,1,0,1,0,1,0,1,1,1,3,1 },
-	{ 1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1 },
-	{ 1,1,1,0,1,1,0,1,0,1,1,1,1,1,0,1 },
-	{ 1,0,0,0,0,1,0,0,0,0,1,0,1,1,0,1 },
-	{ 1,0,1,0,0,1,0,1,0,3,1,0,0,0,0,1 },
-	{ 1,0,1,0,1,1,1,1,0,1,1,0,1,1,1,1 },
-	{ 1,0,1,0,0,0,0,1,4,1,0,0,0,1,0,1 },
-	{ 1,0,1,1,1,1,0,1,0,1,1,0,1,1,0,1 },
-	{ 1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1 },
-	{ 1,3,1,1,0,3,0,0,0,0,1,0,0,1,0,1 },
-	{ 1,0,0,1,0,1,1,1,1,0,1,1,0,1,1,1 },
-	{ 1,1,0,1,0,1,0,0,0,1,1,0,0,1,0,1 },
-	{ 1,1,0,0,0,1,0,1,0,0,0,0,0,3,0,1 },
-	{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
-};
-
-string getObject(int x, int y)
+void renderPlayer(player pr)
 {
-	string render;
-
-	int cell = map[x][y];
-
-	if (cell == WALL)
-		render = "[ ]";
-	else if (cell == SPACE)
-		render = "   ";
-	else if (cell == PLAYER)
-		render = " X ";
-	else if (cell == RUNE)
-		render = " $ ";
-	else if (cell == MINE)
-		render = " * ";	
-		
-
-	return render;
+	map[pr.cord.y][pr.cord.x] = PLAYER;
 }
 
-void renderMap()
+void initPlayer()
 {
-	SetConsoleCursorPosition(ñonsole, position);
+	player p1;
 
-	cout << "Hello Dota 3 beta" << endl;
-	cout << "Health: " << p.health << "=====" << endl;
-	cout << "score: " << p.mana << endl;
+	p1.name = "pudge";
+	p1.health = 200;;
+	p1.body = " @ ";
 
-	for (int i = 0; i < H; i++)
-	{
-		for (int c = 0; c < W; c++)
-		{
-			cout << getObject(i, c);
-		}
-		cout << endl;
-	}
+	player p2;
+
+	p2.name = "invoker";
+	p2.health = 100;
+	p2.mana = 100;
+	p2.body = " I ";
+
+	player p3;
+
+	p3.name = "Slark";
+	p3.health = 150;
+	p3.body = " ! ";
+
+	players[0] = p1;
+	players[1] = p2;
+	players[2] = p3;
+
+	p = players[0];
 }
 
 void createObject(int object)
@@ -135,7 +144,63 @@ void createObject(int object)
 	map[yR][xR] = object;
 }
 
-void checkKey()
+string getObject(int x, int y)
+{
+	string render;
+
+	int cell = map[x][y];
+
+	if (cell == WALL)
+		render = "[ ]";
+	else if (cell == SPACE)
+		render = "   ";
+	else if (cell == PLAYER)
+		render = p.body;
+	else if (cell == RUNE)
+		render = " $ ";
+	else if (cell == MINE)
+		render = " * ";			
+
+	return render;
+}
+
+void renderMap()
+{
+	SetConsoleCursorPosition(ñonsole, position);
+
+	cout << "Hello Dota 3 beta" << endl;
+	cout << "Health: " << p.health << "     " << endl;
+	cout << "score: " << p.mana << endl;
+
+	for (int i = 0; i < H; i++)
+	{
+		for (int c = 0; c < W; c++)
+		{
+			cout << getObject(i, c);
+		}
+		cout << endl;
+	}
+}
+
+void loadMap()
+{
+	ifstream in("levels/lvl" + to_string(level) + ".txt");
+
+	int j = 0;
+	string str;
+
+	while (getline(in, str))
+	{
+		for (int i = 0; i < W; i++)
+		{
+			char c = str[i];
+			map[j][i] = atoi(&c);
+		}
+		j++;
+	}
+}
+
+void checkKeyPlayer()
 {
 	if (_kbhit())
 	{
@@ -151,9 +216,80 @@ void checkKey()
 	}
 }
 
-void renderPlayer(player pr)
+void initMenu()
 {
-	map[pr.cord.y][pr.cord.x] = PLAYER;
+	params[0] = "Íà÷àòü èãðó";
+	params[1] = "Ïåðñîíàæ = " + players[numPlayer].name;
+	params[2] = "Êàðòà = " + to_string(level);
+	params[3] = "Âûéòè";
+}
+
+void renderMenu()
+{
+	system("cls");
+	cout << "   === ÌÅÍÞ ===  " << endl;
+
+	params[cursor] = " -> " + params[cursor];
+
+	for (int i = 0; i < COUNT_PARAMS; i++)
+		cout << params[i] << endl;
+}
+
+void processKeyMenu(int k)
+{
+	if (k == KEY_ENTER)
+	{
+		if (cursor == 0)
+			startGame();
+		else if (cursor == 3)
+			exitGame();
+	}
+	else if (k == KEY_LEFT)
+	{
+		if (cursor == 1)
+		{
+			numPlayer--;
+			if (numPlayer < 0)
+				numPlayer++;
+		}
+		if (cursor == 2)
+			level--;
+	}
+	else if (k == KEY_RIGHT)
+	{
+		if (cursor == 1)
+		{
+			numPlayer++;
+			if (numPlayer >= COUNT_PLAYERS)
+				numPlayer--;
+		}
+		if (cursor == 2)
+			level++;
+	}
+	else if (k == KEY_UP)
+	{
+		cursor--;
+		if (cursor < 0)
+			cursor++;
+	}
+	else if (k == KEY_DOWN)
+	{
+		cursor++;
+		if (cursor >= COUNT_PARAMS)
+			cursor--;
+	}
+}
+
+void checkKeyMenu()
+{
+	if (_kbhit())
+		processKeyMenu(_getch());
+}
+
+void exitGame()
+{
+	isStart = false;
+	isMenu = false;
 }
 
 void checkGameWin()
@@ -162,7 +298,7 @@ void checkGameWin()
 	{
 		system("cls");
 		cout << "You WIN!!" << endl;
-		isStart = false;
+		exitGame();
 	}
 }
 
@@ -172,29 +308,47 @@ void checkGameOver()
 	{
 		system("cls");
 		cout << "Game Over!" << endl;
-		isStart = false;
+		exitGame();
 	}
 }
 
-int main()
+void startGame()
 {
-	p.name = "pudge";
-	p.health = 100;
-	p.mana = 0;
-	p.cord.x = 1;
-	p.cord.y = 1;
+	loadMap();
 
-	while (isStart)       
+	p = players[numPlayer];
+
+	while (isStart)
 	{
-		renderMap(); 
+		renderMap();
 		renderPlayer(p);
-		checkKey();
+		checkKeyPlayer();
 
 		checkGameWin();
 		checkGameOver();
 
 		Sleep(FPS);
 	}
+}
+
+void runMenu()
+{
+	while (isMenu)
+	{
+		initMenu();
+		checkKeyMenu();
+		renderMenu();
+
+		Sleep(FPS);
+	}
+}
+
+int main()
+{
+	setlocale(0, "RUS");
+	
+	initPlayer();
+	runMenu();
 
 	system("pause");
 
